@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css?family=Russo+One');
+
+h1 {
+  color:#073749;
+  font-family: 'Russo One', sans-serif;
+  font: Bold 45px "Russo One";
+}
+
+p {
+  color:#073749;
+  font-family: 'Russo One', sans-serif;
+  font: Bold 15px "Russo One";
+}
+
+canvas {
+  border: 3px solid black;
+  margin-top: -8px;
+}
+
+progress {
+  width: 436px;
+}

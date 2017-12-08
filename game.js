@@ -129,8 +129,7 @@ class Money extends Sprite {
     constructor(x, y, width, height, speed) {
         super();
         this.image = new Image();
-        this.image.src =
-        "https://vignette.wikia.nocookie.net/clubpenguin/images/2/2b/Money_Bag_Emote.png/revision/latest?cb=20130426014904";
+        this.image.src = "https://vignette.wikia.nocookie.net/clubpenguin/images/2/2b/Money_Bag_Emote.png/revision/latest?cb=20130426014904";
         Object.assign(this, { x, y, width, height, speed });
     }
     draw() {
@@ -224,12 +223,12 @@ function startGameScreen() {
 function gameOverScreen() {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.font = "27px Arial";
+    ctx.font = "27px Gill Sans";
     ctx.fillStyle = "white";
     ctx.align = "center";
     ctx.fillText(
         "Welcome to Los Angeles County Jail.",
-        canvas.width / 2 - 220,
+        canvas.width / 2 - 200,
         canvas.height / 2 - 20
     );
     ctx.font = "20px";

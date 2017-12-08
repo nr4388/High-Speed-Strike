@@ -53,6 +53,12 @@ function levelUp() {
 function stayOnTheRoad() {
     if (criminal.x < 250) {
         criminal.x = 250;
+    } else if (criminal.x > 500) {
+        criminal.x = 500;
+    } else if (criminal.y < 0) {
+        criminal.y = 0;
+    } else if (criminal.y > 500) {
+        criminal.y = 500;
     }
 }
 
@@ -281,7 +287,7 @@ function updateScene() {
         if (haveCollided(criminal, heart)) {
             let i = heartsOnStreet.indexOf(heart);
             heartsOnStreet.splice(i, 1);
-            progressBar.value += 1;
+            progressBar.value += 5;
         }
     });
 }

@@ -4,24 +4,8 @@ const progressBar = document.querySelector("progress");
 let policeEvaded = document.getElementById("result");
 let currentLevel = document.getElementById("level");
 let i = 1;
-let seconds = 0;
 let moneyPickedUp = 0;
-let levels = 0;
-
-//currently a button. change to click
-function pause() {
-    let pause = confirm("Game paused. Click OK to continue.");
-    document.getElementById("canvas").addEventListener("click", pause);
-
-    if (options) {
-        ReDopause();
-        return;
-    }
-}
-
-var ReDopause = function() {
-    pause();
-};
+let levels = 1;
 
 function haveCollided(sprite1, sprite2) {
     return (
@@ -30,6 +14,32 @@ function haveCollided(sprite1, sprite2) {
         sprite2.x + sprite2.width > sprite1.x &&
         sprite2.y + sprite2.height > sprite1.y
     );
+}
+
+function pushOff(c1, c2) {
+    if (haveCollided(c1,c2)) {
+        if (c1.x + c1.width > c2.x) {
+            c1.x -= 5;
+            c2.x += 5;
+        } else if (c1.y + c1.height > c2.y) {
+            c1.y -= 5;
+            c2.y += 5;
+        } else if (c2.x + c2.width > c1.x) {
+            c1.x += 5;
+            c2.x -= 5;
+        } else {
+            c1.y += 5;
+            c2.y -= 5;
+        }
+    }
+}
+
+function collisionDetection() {
+    for (let i=0; i < policeCars.length; ++i) {
+        for (let j=i+1; j < policeCars.length; ++j) {
+            pushOff(policeCars[i], policeCars[j]);
+        }
+    }
 }
 
 class Sprite {
@@ -44,9 +54,9 @@ class Sprite {
 
 class Background {
     constructor(x, y) {
-        //super();
         this.image = new Image();
-        this.image.src = "https://opengameart.org/sites/default/files/background-1_0.png";
+        this.image.src =
+        "https://opengameart.org/sites/default/files/background-1_0.png";
         Object.assign(this, { x, y });
     }
     draw() {
@@ -59,29 +69,17 @@ class Background {
     }
 }
 
-function moveBackground() {
-    if (normalBackground.y >= 500) {
-        topBackground.y = -500;
-        normalBackground.y = 0;
-    }
-}
-
-let topBackground = (new Background(0, -500));
-let normalBackground = (new Background(0, 0));
-
 class Hero extends Sprite {
     constructor(x, y, width, height, speed) {
         super();
         this.image = new Image();
-        this.image.src = "https://image.ibb.co/e62ZSw/Black_viper.png";
+        this.image.src = "https://image.ibb.co/kzAd5G/Black_viper.png";
         Object.assign(this, { x, y, width, height, speed });
     }
     draw() {
         ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
 }
-
-let hero = new Hero(250, 250, 100, 100, 0.5);
 
 class Police extends Sprite {
     constructor(x, y, width, height, speed) {
@@ -95,31 +93,11 @@ class Police extends Sprite {
     }
 }
 
-let policeCars = [
-    new Police(500, 500, 40, 80, 0.007),
-    new Police(400, 450, 40, 80, 0.009),
-    new Police(300, 475, 40, 80, 0.011)
-];
-
 class Heart extends Sprite {
     constructor(x, y, width, height, speed) {
         super();
         this.image = new Image();
         this.image.src = "http://www.freeiconspng.com/uploads/heart-png-15.png";
-        Object.assign(this, {x, y, width, height, speed});
-    }
-    draw() {
-        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-    }
-}
-
-let heartsOnStreet = [];
-
-class Money extends Sprite {
-    constructor(x, y, width, height, speed) {
-        super();
-        this.image = new Image();
-        this.image.src = "https://vignette.wikia.nocookie.net/clubpenguin/images/2/2b/Money_Bag_Emote.png/revision/latest?cb=20130426014904";
         Object.assign(this, { x, y, width, height, speed });
     }
     draw() {
@@ -127,29 +105,74 @@ class Money extends Sprite {
     }
 }
 
+class Money extends Sprite {
+    constructor(x, y, width, height, speed) {
+        super();
+        this.image = new Image();
+        this.image.src =
+        "https://vignette.wikia.nocookie.net/clubpenguin/images/2/2b/Money_Bag_Emote.png/revision/latest?cb=20130426014904";
+        Object.assign(this, { x, y, width, height, speed });
+    }
+    draw() {
+        ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    }
+}
+
+let topBackground = new Background(0, -500);
+let normalBackground = new Background(0, 0);
+
+let hero = new Hero(250, 250, 40, 80, 0.5);
+
+let policeCars = [
+    new Police(500, 500, 40, 80, 0.007),
+    new Police(250, 500, 40, 80, 0.009)
+];
+
 let moneyBagsOnStreet = [];
 
+let heartsOnStreet = [];
+
+function moveBackground() {
+    if (normalBackground.y >= 500) {
+        topBackground.y = -500;
+        normalBackground.y = 0;
+    }
+}
+
 function spawnPoliceCars() {
-    if (i % 400 === 0) {
+    if (i % 300 === 0) {
         policeCars.push(
-            (new Police(Math.random() * 250, Math.random() * 250, 40, 80, 0.007)), (new Police(Math.random() * 250, Math.random() * 250, 40, 80, 0.005))
+            new Police(345, 500, 40, 80, 0.005),
+            new Police(225, 500, 40, 80, 0.007)
+        );
+        if (levels === 1) {
+            policeCars.push(
+                new Police(345, 0, 40, 80, 0.005),
+                new Police(225, 0, 40, 80, 0.007)
+            );
+        }
+    }
+
+    Background.updateBackground();
+}
+
+function spawnHeartsOnStreet() {
+    if (i % 150 === 0) {
+        heartsOnStreet.push(
+            new Heart(Math.random() * (470-150) + 150, Math.random() * (470-100) + 100, 40, 40, 0)
         );
     }
 }
 
-function spawnHeartsOnStreet() {
-    if (i % 600 === 0) {
-        heartsOnStreet.push(new Heart(Math.random() * 250, Math.random() * 250, 40, 40, 0));
-    }
-}
-
 function spawnMoneyBagsOnStreet() {
-    if (i % 400 === 0) {
-        moneyBagsOnStreet.push(new Money(Math.random() * 250, Math.random() * 250, 30, 30, 0));
+    if (i % 150 === 0) {
+        moneyBagsOnStreet.push(
+            new Money(Math.random() * (470-150) + 150, Math.random() * (470-100) + 100, 30, 30, 0)
+        );
     }
 }
 
-let mouse = { x: 0, y: 0 };
+let mouse = { x: 0, y: 0, width: 0, height: 0 };
 document.body.addEventListener("mousemove", updateMouse);
 function updateMouse(event) {
     const { left, top } = canvas.getBoundingClientRect();
@@ -158,45 +181,109 @@ function updateMouse(event) {
 }
 
 function policeChase(leader, follower, speed) {
-    follower.x += (leader.x - follower.x) * speed;
-    follower.y += (leader.y - follower.y) * speed;
+    follower.x +=
+    (leader.x + leader.width / 2 - (follower.x + follower.width / 2)) * speed;
+    follower.y +=
+    (leader.y + leader.height / 2 - (follower.y + follower.height / 2)) * speed;
 }
 
 function levelUp() {
-    if (i % 1000 === 0) {
+    if (moneyPickedUp % 500 === 0) {
         ++levels;
         currentLevel.innerHTML = levels;
     }
 }
 
+function stayOnTheRoad() {
+    if (hero.x < 250) {
+        hero.x = 250;
+    }
+}
+
+function startGameScreen() {
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = "27px Arial";
+    ctx.fillStyle = "white";
+    ctx.align = "center";
+    ctx.fillText(
+        "It's a high speed chase! Lose the cops!",
+        canvas.width / 2 - 230,
+        canvas.height / 2 - 20
+    );
+    ctx.fillText("Click to Go!", canvas.width / 2 - 80, canvas.height / 2 + 60);
+    canvas.addEventListener("click", restartGame);
+}
+
+function gameOverScreen() {
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = "27px Arial";
+    ctx.fillStyle = "white";
+    ctx.align = "center";
+    ctx.fillText(
+        "Welcome to Los Angeles County Jail.",
+        canvas.width / 2 - 220,
+        canvas.height / 2 - 20
+    );
+    ctx.font = "20px";
+    ctx.fillText(
+        "Click to Restart",
+        canvas.width / 2 - 95,
+        canvas.height / 2 + 60
+    );
+    canvas.addEventListener("click", restartGame);
+}
+
+function restartGame() {
+    canvas.removeEventListener("click", restartGame);
+    progressBar.value = 100;
+    levels = 0;
+    currentLevel.innerHTML = levels;
+    moneyPickedUp = 0;
+    moneyBagsOnStreet.length = 0;
+    heartsOnStreet.length = 0;
+    policeEvaded.innerHTML = moneyPickedUp;
+    Object.assign(hero, { x: canvas.width / 2, y: canvas.height / 2 });
+    policeCars = [
+        new Police(500, 500, 40, 80, 0.007),
+        new Police(250, 500, 40, 80, 0.009)
+    ];
+    requestAnimationFrame(drawScene);
+}
+
 function updateScene() {
+    i++;
+    spawnPoliceCars();
     Background.updateBackground();
+    spawnHeartsOnStreet();
+    spawnMoneyBagsOnStreet();
+    stayOnTheRoad();
+    collisionDetection();
     policeChase(mouse, hero, hero.speed);
     policeCars.forEach(police => policeChase(hero, police, police.speed));
     policeCars.forEach(police => {
         if (haveCollided(police, hero)) {
-            progressBar.value -= 0.5;
+            progressBar.value -= 1;
         }
     });
     moneyBagsOnStreet.forEach(money => {
         if (haveCollided(hero, money)) {
-            moneyBagsOnStreet.pop();
-            policeCars.pop();
+            let i = moneyBagsOnStreet.indexOf(money);
+            moneyBagsOnStreet.splice(i, 1);
+            policeCars.shift();
             moneyPickedUp += 100;
+            levelUp();
             policeEvaded.innerHTML = moneyPickedUp;
         }
     });
     heartsOnStreet.forEach(heart => {
         if (haveCollided(hero, heart)) {
-            heartsOnStreet.pop();
-            ++progressBar.value;
+            let i = heartsOnStreet.indexOf(heart);
+            heartsOnStreet.splice(i, 1);
+            progressBar.value += 1;
         }
     });
-    i++;
-    spawnPoliceCars();
-    spawnMoneyBagsOnStreet();
-    spawnHeartsOnStreet();
-    levelUp();
 }
 
 function drawScene() {
@@ -208,11 +295,11 @@ function drawScene() {
     policeCars.forEach(police => police.draw());
     updateScene();
     if (progressBar.value <= 0) {
-        ctx.font = "35px Arial";
-        ctx.fillText("Game over.", 15, canvas.height / 2);
+        gameOverScreen();
     } else {
         requestAnimationFrame(drawScene);
     }
 }
 
+requestAnimationFrame(startGameScreen());
 requestAnimationFrame(drawScene);

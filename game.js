@@ -43,13 +43,16 @@ function collisionDetection() {
     }
 }
 
-class Sprite {
-    draw() {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.rect(this.x, this.y, this.width, this.height);
-        ctx.fill();
-        ctx.stroke();
+function levelUp() {
+    if (moneyPickedUp % 500 === 0) {
+        ++levels;
+        currentLevel.innerHTML = levels;
+    }
+}
+
+function stayOnTheRoad() {
+    if (criminal.x < 250) {
+        criminal.x = 250;
     }
 }
 
@@ -70,7 +73,17 @@ class Background {
     }
 }
 
-class Hero extends Sprite {
+class Sprite {
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.rect(this.x, this.y, this.width, this.height);
+        ctx.fill();
+        ctx.stroke();
+    }
+}
+
+class Criminal extends Sprite {
     constructor(x, y, width, height, speed) {
         super();
         this.image = new Image();
@@ -122,16 +135,16 @@ class Money extends Sprite {
 let topBackground = new Background(0, -500);
 let normalBackground = new Background(0, 0);
 
-let hero = new Hero(250, 250, 40, 80, 0.5);
+let criminal = new Criminal(250, 250, 40, 80, 0.5);
 
 let policeCars = [
     new Police(500, 500, 40, 80, 0.007),
     new Police(250, 500, 40, 80, 0.009)
 ];
 
-let moneyBagsOnStreet = [];
-
 let heartsOnStreet = [];
+
+let moneyBagsOnStreet = [];
 
 function moveBackground() {
     if (normalBackground.y >= 500) {
@@ -153,7 +166,6 @@ function spawnPoliceCars() {
             );
         }
     }
-
     Background.updateBackground();
 }
 
@@ -186,19 +198,6 @@ function policeChase(leader, follower, speed) {
     (leader.x + leader.width / 2 - (follower.x + follower.width / 2)) * speed;
     follower.y +=
     (leader.y + leader.height / 2 - (follower.y + follower.height / 2)) * speed;
-}
-
-function levelUp() {
-    if (moneyPickedUp % 500 === 0) {
-        ++levels;
-        currentLevel.innerHTML = levels;
-    }
-}
-
-function stayOnTheRoad() {
-    if (hero.x < 250) {
-        hero.x = 250;
-    }
 }
 
 function startGameScreen() {
@@ -245,7 +244,7 @@ function restartGame() {
     moneyBagsOnStreet.length = 0;
     heartsOnStreet.length = 0;
     policeEvaded.innerHTML = moneyPickedUp;
-    Object.assign(hero, { x: canvas.width / 2, y: canvas.height / 2 });
+    Object.assign(criminal, { x: canvas.width / 2, y: canvas.height / 2 });
     policeCars = [
         new Police(500, 500, 40, 80, 0.007),
         new Police(250, 500, 40, 80, 0.009)
@@ -261,15 +260,15 @@ function updateScene() {
     spawnMoneyBagsOnStreet();
     stayOnTheRoad();
     collisionDetection();
-    policeChase(mouse, hero, hero.speed);
-    policeCars.forEach(police => policeChase(hero, police, police.speed));
+    policeChase(mouse, criminal, criminal.speed);
+    policeCars.forEach(police => policeChase(criminal, police, police.speed));
     policeCars.forEach(police => {
-        if (haveCollided(police, hero)) {
+        if (haveCollided(police, criminal)) {
             progressBar.value -= 1;
         }
     });
     moneyBagsOnStreet.forEach(money => {
-        if (haveCollided(hero, money)) {
+        if (haveCollided(criminal, money)) {
             let i = moneyBagsOnStreet.indexOf(money);
             moneyBagsOnStreet.splice(i, 1);
             policeCars.shift();
@@ -279,7 +278,7 @@ function updateScene() {
         }
     });
     heartsOnStreet.forEach(heart => {
-        if (haveCollided(hero, heart)) {
+        if (haveCollided(criminal, heart)) {
             let i = heartsOnStreet.indexOf(heart);
             heartsOnStreet.splice(i, 1);
             progressBar.value += 1;
@@ -290,7 +289,7 @@ function updateScene() {
 function drawScene() {
     topBackground.draw();
     normalBackground.draw();
-    hero.draw();
+    criminal.draw();
     moneyBagsOnStreet.forEach(money => money.draw());
     heartsOnStreet.forEach(heart => heart.draw());
     policeCars.forEach(police => police.draw());

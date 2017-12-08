@@ -7,6 +7,7 @@ let i = 1;
 let moneyPickedUp = 0;
 let levels = 1;
 
+
 function haveCollided(sprite1, sprite2) {
     return (
         sprite1.x + sprite1.width > sprite2.x &&
